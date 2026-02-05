@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Will you be my Valentine?</title>
+  <style>
+    :root{
+      --pink-bg:#f6c7d4;
+      --card:#f3f0ec;
+      --shadow: 0 18px 50px rgba(0,0,0,.18);
+      --text:#111;
+      --muted:#6c6c6c;
+      --yes:#ff4f87;
+      --yes-hover:#ff2f72;
+      --btn:#e9e3dd;
+      --btn-hover:#ded6cf;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      background: radial-gradient(1200px 800px at 50% 10%, rgba(255,255,255,.35), transparent 60%),
+                  var(--pink-bg);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+    }
+
+    .card{
+      width:min(760px, 92vw);
+      background:var(--card);
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      padding:36px 26px 26px;
+      position:relative;
+      overflow:hidden;
+      border: 1px solid rgba(0,0,0,.05);
+    }
+
+    .top{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:12px;
+      margin-bottom:18px;
+    }
+
+    /* Petit “hibou”/tête façon emoji */
+    .owl{
+      width:74px; height:74px;
+      border-radius:50%;
+      background: #f1b07a;
+      position:relative;
+      box-shadow: inset 0 -8px 0 rgba(0,0,0,.06);
+    }
+    .owl:before, .owl:after{
+      content:"";
+      position:absolute;
+      top:18px;
+      width:10px; height:10px;
+      border-radius:50%;
+      background:#111;
+    }
+    .owl:before{ left:24px; }
+    .owl:after{ right:24px; }
+
+    .beak{
+      position:absolute;
+      left:50%; top:38px;
+      width:10px; height:10px;
+      background:#ff6b8a;
+      transform: translateX(-50%) rotate(45deg);
+      border-radius:2px;
+    }
+    .heart{
+      position:absolute;
+      right:-6px; top:4px;
+      width:22px; height:22px;
+      background:#ff3b7a;
+      transform: rotate(45deg);
+      border-radius:4px;
+      box-shadow: 0 8px 18px rgba(255,59,122,.35);
+    }
+    .heart:before,.heart:after{
+      content:"";
+      position:absolute;
+      width:22px; height:22px;
+      background:#ff3b7a;
+      border-radius:50%;
+    }
+    .heart:before{ left:-11px; top:0; }
+    .heart:after{ left:0; top:-11px; }
+
+    h1{
+      margin:0;
+      font-size: clamp(22px, 2.6vw, 34px);
+      font-weight:800;
+      letter-spacing:-.2px;
+      text-align:center;
+    }
+
+    .btns{
+      margin-top:22px;
+      display:flex;
+      justify-content:center;
+      gap:18px;
+      position:relative;
+      height:56px;
+    }
+
+    button{
+      appearance:none;
+      border:0;
+      font-weight:700;
+      border-radius:999px;
+      padding:12px 26px;
+      cursor:pointer;
+      transition: transform .08s ease, background .15s ease;
+      box-shadow: 0 10px 22px rgba(0,0,0,.10);
+      user-select:none;
+    }
+    button:active{ transform: translateY(1px) scale(.99); }
+
+    #yesBtn{
+      background: var(--yes);
+      color: #fff;
+      min-width:110px;
+    }
+    #yesBtn:hover{ background: var(--yes-hover); }
+
+    /* Le bouton No est “positionné” pour pouvoir fuir */
+    #noBtn{
+      background: var(--btn);
+      color:#222;
+      min-width:110px;
+      position:absolute;
+      left: calc(50% + 70px);
+      top: 0;
+    }
+    #noBtn:hover{ background: var(--btn-hover); }
+
+    .hint{
+      margin-top:22px;
+      text-align:center;
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    /* Petit effet “pop” quand elle dit oui */
+    .toast{
+      position:fixed;
+      inset:auto 0 24px 0;
+      margin:auto;
+      width:min(520px, 92vw);
+      background: rgba(17,17,17,.92);
+      color:#fff;
+      padding:14px 16px;
+      border-radius:14px;
+      text-align:center;
+      transform: translateY(30px);
+      opacity:0;
+      pointer-events:none;
+      transition: .25s ease;
+    }
+    .toast.show{
+      transform: translateY(0);
+      opacity:1;
+    }
+  </style>
+</head>
+<body>
+
+  <main class="card" id="card">
+    <div class="top">
+      <div class="owl" aria-hidden="true">
+        <div class="beak"></div>
+        <div class="heart"></div>
+      </div>
+
+      <h1 id="title">… will you be my valentine?</h1>
+    </div>
+
+    <div class="btns" id="btnArea">
+      <button id="yesBtn">Yes</button>
+      <button id="noBtn">No</button>
+    </div>
+
+    <div class="hint" id="hint">“No” seems a bit shy 😈</div>
+  </main>
+
+  <div class="toast" id="toast">💖 YAY! Rendez-vous : bisous + surprise 💖</div>
+
+<script>
+  // ========= PERSONNALISATION =========
+  const HER_NAME = "Delphine"; // <-- Mets le prénom/surnom ici
+  const YES_MESSAGE = "💖 YAY! J’ai un petit truc prévu… 💖";
+  const HINT_TEXT = "“Non” est super timide, et c'est OK 😈";
+  // ===================================
+
+  const title = document.getElementById("title");
+  const hint = document.getElementById("hint");
+  const toast = document.getElementById("toast");
+  const noBtn = document.getElementById("noBtn");
+  const yesBtn = document.getElementById("yesBtn");
+  const btnArea = document.getElementById("btnArea");
+  const card = document.getElementById("card");
+
+  title.textContent = `${HER_NAME.toLowerCase()} will you be my valentine?`;
+  hint.textContent = HINT_TEXT;
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add("show");
+    setTimeout(()=> toast.classList.remove("show"), 2600);
+  }
+
+  yesBtn.addEventListener("click", () => {
+    showToast(YES_MESSAGE);
+    // petit “shake” mignon
+    card.animate(
+      [{transform:"scale(1)"},{transform:"scale(1.02)"},{transform:"scale(1)"}],
+      {duration:260, easing:"ease-out"}
+    );
+  });
+
+  function moveNoButton(){
+    // On limite le déplacement à l’intérieur de la zone des boutons
+    const areaRect = btnArea.getBoundingClientRect();
+    const btnRect = noBtn.getBoundingClientRect();
+
+    const padding = 6;
+    const maxX = areaRect.width - btnRect.width - padding;
+    const maxY = areaRect.height - btnRect.height - padding;
+
+    // position random
+    const x = Math.max(padding, Math.random() * maxX);
+    const y = Math.max(padding, Math.random() * maxY);
+
+    noBtn.style.left = `${x}px`;
+    noBtn.style.top = `${y}px`;
+  }
+
+  // Le bouton "No" fuit dès qu'on l'approche (desktop)…
+  noBtn.addEventListener("mouseenter", moveNoButton);
+  // …et sur mobile, il fuit au toucher
+  noBtn.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    moveNoButton();
+  }, {passive:false});
+
+  // Option : si elle clique quand même par miracle
+  noBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    moveNoButton();
+  });
+</script>
+
+</body>
+</html>
