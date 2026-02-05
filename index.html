@@ -2,8 +2,9 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Will you be my Valentine?</title>
+
   <style>
     :root{
       --pink-bg:#f6c7d4;
@@ -11,19 +12,24 @@
       --shadow: 0 18px 50px rgba(0,0,0,.18);
       --text:#111;
       --muted:#6c6c6c;
+
       --yes:#ff4f87;
       --yes-hover:#ff2f72;
+
       --btn:#e9e3dd;
       --btn-hover:#ded6cf;
     }
-    *{box-sizing:border-box}
+
+    *{ box-sizing:border-box; }
+
     body{
       margin:0;
       min-height:100vh;
       display:grid;
       place-items:center;
-      background: radial-gradient(1200px 800px at 50% 10%, rgba(255,255,255,.35), transparent 60%),
-                  var(--pink-bg);
+      background:
+        radial-gradient(1200px 800px at 50% 10%, rgba(255,255,255,.35), transparent 60%),
+        var(--pink-bg);
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color:var(--text);
     }
@@ -47,7 +53,7 @@
       margin-bottom:18px;
     }
 
-    /* Petit “hibou”/tête façon emoji */
+    /* Petit “hibou”/tête */
     .owl{
       width:74px; height:74px;
       border-radius:50%;
@@ -99,6 +105,7 @@
       font-weight:800;
       letter-spacing:-.2px;
       text-align:center;
+      text-transform: lowercase;
     }
 
     .btns{
@@ -107,37 +114,41 @@
       justify-content:center;
       gap:18px;
       position:relative;
-      height:56px;
+      height:62px;          /* un peu plus haut pour laisser bouger le "No" */
+      overflow:visible;
     }
 
     button{
       appearance:none;
       border:0;
-      font-weight:700;
+      font-weight:800;
       border-radius:999px;
-      padding:12px 26px;
+      padding:14px 30px;
       cursor:pointer;
       transition: transform .08s ease, background .15s ease;
       box-shadow: 0 10px 22px rgba(0,0,0,.10);
       user-select:none;
+      font-size:15px;
     }
     button:active{ transform: translateY(1px) scale(.99); }
 
     #yesBtn{
       background: var(--yes);
       color: #fff;
-      min-width:110px;
+      min-width:120px;
+      z-index:2;
     }
     #yesBtn:hover{ background: var(--yes-hover); }
 
-    /* Le bouton No est “positionné” pour pouvoir fuir */
+    /* Le bouton No est positionné pour fuir */
     #noBtn{
       background: var(--btn);
       color:#222;
-      min-width:110px;
+      min-width:120px;
       position:absolute;
-      left: calc(50% + 70px);
+      left: calc(50% + 90px);
       top: 0;
+      z-index:1;
     }
     #noBtn:hover{ background: var(--btn-hover); }
 
@@ -148,29 +159,81 @@
       color:var(--muted);
     }
 
-    /* Petit effet “pop” quand elle dit oui */
-    .toast{
+    /* CONFETTIS */
+    #confetti{
       position:fixed;
-      inset:auto 0 24px 0;
-      margin:auto;
-      width:min(520px, 92vw);
-      background: rgba(17,17,17,.92);
-      color:#fff;
-      padding:14px 16px;
-      border-radius:14px;
-      text-align:center;
-      transform: translateY(30px);
-      opacity:0;
+      inset:0;
       pointer-events:none;
-      transition: .25s ease;
+      overflow:hidden;
+      z-index:9998;
     }
-    .toast.show{
-      transform: translateY(0);
-      opacity:1;
+    .confetti-piece{
+      position:absolute;
+      width:10px; height:10px;
+      border-radius:2px;
+      opacity:.95;
+      animation: confetti-fall linear forwards;
+      will-change: transform;
     }
+    @keyframes confetti-fall{
+      to{ transform: translateY(110vh) rotate(720deg); }
+    }
+
+    /* MESSAGE FINAL (GROS, AU MILIEU) */
+    .overlay{
+      position:fixed;
+      inset:0;
+      display:none;
+      place-items:center;
+      z-index:9999;
+      background: rgba(0,0,0,.35);
+      backdrop-filter: blur(6px);
+      padding:24px;
+    }
+    .overlay.show{ display:grid; }
+
+    .overlay-card{
+      width:min(900px, 94vw);
+      background: rgba(255,255,255,.92);
+      border-radius:22px;
+      box-shadow: 0 24px 70px rgba(0,0,0,.35);
+      padding:28px 22px;
+      text-align:center;
+      border: 1px solid rgba(0,0,0,.06);
+      transform: scale(.98);
+      animation: pop .22s ease-out forwards;
+    }
+    @keyframes pop{
+      to{ transform: scale(1); }
+    }
+
+    .big{
+      font-weight:900;
+      letter-spacing:-.6px;
+      font-size: clamp(34px, 5vw, 72px);
+      margin: 6px 0 10px;
+    }
+    .sub{
+      font-size: clamp(16px, 2.2vw, 22px);
+      margin: 0 0 14px;
+      color:#222;
+      opacity:.9;
+    }
+    .close{
+      margin-top:8px;
+      background:#111;
+      color:#fff;
+      border-radius:999px;
+      padding:12px 18px;
+      font-weight:800;
+      box-shadow: 0 10px 22px rgba(0,0,0,.18);
+    }
+    .close:hover{ filter:brightness(1.05); }
   </style>
 </head>
+
 <body>
+  <div id="confetti"></div>
 
   <main class="card" id="card">
     <div class="top">
@@ -178,8 +241,7 @@
         <div class="beak"></div>
         <div class="heart"></div>
       </div>
-
-      <h1 id="title">… will you be my valentine?</h1>
+      <h1 id="title"></h1>
     </div>
 
     <div class="btns" id="btnArea">
@@ -190,72 +252,180 @@
     <div class="hint" id="hint">“No” seems a bit shy 😈</div>
   </main>
 
-  <div class="toast" id="toast">💖 YAY! Rendez-vous : bisous + surprise 💖</div>
+  <!-- Message final géant -->
+  <div class="overlay" id="overlay">
+    <div class="overlay-card">
+      <div class="big" id="bigText">YAAAAY 💖</div>
+      <p class="sub" id="subText">J’ai un petit truc prévu… 😏</p>
+      <button class="close" id="closeOverlay">OK 😘</button>
+    </div>
+  </div>
 
-<script>
-  // ========= PERSONNALISATION =========
-  const HER_NAME = "Delphine"; // <-- Mets le prénom/surnom ici
-  const YES_MESSAGE = "💖 YAY! J’ai un petit truc prévu… 💖";
-  const HINT_TEXT = "“Non” est super timide, et c'est OK 😈";
-  // ===================================
+  <script>
+    // ========= PERSONNALISATION =========
+    const HER_NAME = "Delphine";
+    const FINAL_BIG = "OUIIIIIIIIIIIII 💖";
+    const FINAL_SUB = "Tu viens d’accepter d’être ma Valentine 😏, et c'est super OK";
+    const HINT_TEXT = "“Non” est super timide 😈";
+    // ===================================
 
-  const title = document.getElementById("title");
-  const hint = document.getElementById("hint");
-  const toast = document.getElementById("toast");
-  const noBtn = document.getElementById("noBtn");
-  const yesBtn = document.getElementById("yesBtn");
-  const btnArea = document.getElementById("btnArea");
-  const card = document.getElementById("card");
+    const title = document.getElementById("title");
+    const hint = document.getElementById("hint");
+    const overlay = document.getElementById("overlay");
+    const bigText = document.getElementById("bigText");
+    const subText = document.getElementById("subText");
+    const closeOverlay = document.getElementById("closeOverlay");
 
-  title.textContent = `${HER_NAME.toLowerCase()} will you be my valentine?`;
-  hint.textContent = HINT_TEXT;
+    const noBtn = document.getElementById("noBtn");
+    const yesBtn = document.getElementById("yesBtn");
+    const btnArea = document.getElementById("btnArea");
+    const card = document.getElementById("card");
 
-  function showToast(msg){
-    toast.textContent = msg;
-    toast.classList.add("show");
-    setTimeout(()=> toast.classList.remove("show"), 2600);
-  }
+    // Texte
+    title.textContent = `${HER_NAME.toLowerCase()} will you be my valentine?`;
+    hint.textContent = HINT_TEXT;
+    bigText.textContent = FINAL_BIG;
+    subText.textContent = FINAL_SUB;
 
-  yesBtn.addEventListener("click", () => {
-    showToast(YES_MESSAGE);
-    // petit “shake” mignon
-    card.animate(
-      [{transform:"scale(1)"},{transform:"scale(1.02)"},{transform:"scale(1)"}],
-      {duration:260, easing:"ease-out"}
-    );
-  });
+    // ---------------- CONFETTIS ----------------
+    const confettiWrap = document.getElementById("confetti");
 
-  function moveNoButton(){
-    // On limite le déplacement à l’intérieur de la zone des boutons
-    const areaRect = btnArea.getBoundingClientRect();
-    const btnRect = noBtn.getBoundingClientRect();
+    function confettiBoom(){
+      const count = 110;
+      for(let i=0;i<count;i++){
+        const d = document.createElement("div");
+        d.className = "confetti-piece";
 
-    const padding = 6;
-    const maxX = areaRect.width - btnRect.width - padding;
-    const maxY = areaRect.height - btnRect.height - padding;
+        // spawn en haut, partout
+        d.style.left = (Math.random()*100) + "vw";
+        d.style.top = (-10 - Math.random()*30) + "px";
 
-    // position random
-    const x = Math.max(padding, Math.random() * maxX);
-    const y = Math.max(padding, Math.random() * maxY);
+        // couleurs aléatoires
+        d.style.background = `hsl(${Math.random()*360}, 90%, 65%)`;
 
-    noBtn.style.left = `${x}px`;
-    noBtn.style.top = `${y}px`;
-  }
+        // tailles variées
+        const s = 6 + Math.random()*10;
+        d.style.width = s + "px";
+        d.style.height = s + "px";
 
-  // Le bouton "No" fuit dès qu'on l'approche (desktop)…
-  noBtn.addEventListener("mouseenter", moveNoButton);
-  // …et sur mobile, il fuit au toucher
-  noBtn.addEventListener("touchstart", (e) => {
-    e.preventDefault();
-    moveNoButton();
-  }, {passive:false});
+        // durée & rotation
+        d.style.animationDuration = (1.1 + Math.random()*1.9) + "s";
+        d.style.transform = `translateY(0) rotate(${Math.random()*180}deg)`;
 
-  // Option : si elle clique quand même par miracle
-  noBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    moveNoButton();
-  });
-</script>
+        confettiWrap.appendChild(d);
+        setTimeout(()=> d.remove(), 3200);
+      }
+    }
 
+    // ---------------- OVERLAY ----------------
+    function showOverlay(){
+      overlay.classList.add("show");
+    }
+    function hideOverlay(){
+      overlay.classList.remove("show");
+    }
+    closeOverlay.addEventListener("click", hideOverlay);
+    overlay.addEventListener("click", (e)=>{
+      if(e.target === overlay) hideOverlay();
+    });
+
+    // ---------------- BOUTON YES ----------------
+    yesBtn.addEventListener("click", () => {
+      confettiBoom();
+      showOverlay();
+
+      // petit effet “pop” sur la carte
+      card.animate(
+        [{transform:"scale(1)"},{transform:"scale(1.02)"},{transform:"scale(1)"}],
+        {duration:260, easing:"ease-out"}
+      );
+
+      // bonus: second boom
+      setTimeout(confettiBoom, 220);
+    });
+
+    // ---------------- BOUTON NO QUI FUIT “PLUS LOIN” ----------------
+    // Idée: on calcule la position du pointeur par rapport au bouton,
+    // puis on téléporte le bouton à l’opposé, avec une grosse distance.
+    function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
+
+    function moveNoButtonAway(pointerClientX, pointerClientY){
+      const areaRect = btnArea.getBoundingClientRect();
+      const btnRect  = noBtn.getBoundingClientRect();
+
+      // centre du bouton
+      const btnCenterX = btnRect.left + btnRect.width/2;
+      const btnCenterY = btnRect.top  + btnRect.height/2;
+
+      // vecteur (pointeur -> bouton)
+      let vx = btnCenterX - pointerClientX;
+      let vy = btnCenterY - pointerClientY;
+
+      // si vecteur trop petit (pile dessus), on randomise un peu
+      const mag = Math.hypot(vx, vy) || 1;
+      vx /= mag; vy /= mag;
+
+      // distance de fuite (grande) + un peu d’aléatoire
+      const flee = 220 + Math.random()*180;
+
+      // position actuelle du bouton dans la zone
+      // (on convertit la position du bouton en coordonnées relatives à btnArea)
+      const currentLeft = (btnRect.left - areaRect.left);
+      const currentTop  = (btnRect.top  - areaRect.top);
+
+      // nouvelle position = actuel + direction opposée au pointeur
+      let newLeft = currentLeft + vx * flee;
+      let newTop  = currentTop  + vy * flee;
+
+      // si ça sort trop, on ajoute un petit random pour éviter les coins “piégeux”
+      const padding = 6;
+      const maxLeft = areaRect.width  - btnRect.width  - padding;
+      const maxTop  = areaRect.height - btnRect.height - padding;
+
+      newLeft = clamp(newLeft, padding, maxLeft);
+      newTop  = clamp(newTop,  padding, maxTop);
+
+      // si on est trop proche de la position du pointeur malgré tout, on relance en random
+      // (cas rare quand la zone est petite)
+      const pointerInAreaX = pointerClientX - areaRect.left;
+      const pointerInAreaY = pointerClientY - areaRect.top;
+      const dx = (newLeft + btnRect.width/2) - pointerInAreaX;
+      const dy = (newTop  + btnRect.height/2) - pointerInAreaY;
+
+      if(Math.hypot(dx, dy) < 140){
+        newLeft = clamp(Math.random()*maxLeft, padding, maxLeft);
+        newTop  = clamp(Math.random()*maxTop,  padding, maxTop);
+      }
+
+      noBtn.style.left = `${newLeft}px`;
+      noBtn.style.top  = `${newTop}px`;
+    }
+
+    // Desktop: dès que la souris s’approche du bouton No
+    noBtn.addEventListener("mouseenter", (e) => {
+      moveNoButtonAway(e.clientX, e.clientY);
+    });
+
+    // Desktop: si elle essaie de le suivre, il continue de fuir
+    noBtn.addEventListener("mousemove", (e) => {
+      moveNoButtonAway(e.clientX, e.clientY);
+    });
+
+    // Mobile: au toucher, il fuit à l'opposé du doigt
+    noBtn.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      const t = e.touches[0];
+      moveNoButtonAway(t.clientX, t.clientY);
+    }, {passive:false});
+
+    // Au clic (si miracle), il se déplace quand même
+    noBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      moveNoButtonAway(
+        (window.innerWidth/2),
+        (window.innerHeight/2)
+      );
+    });
+  </script>
 </body>
 </html>
